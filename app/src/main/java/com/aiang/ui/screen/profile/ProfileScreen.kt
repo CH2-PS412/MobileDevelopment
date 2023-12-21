@@ -37,16 +37,20 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.aiang.R
 import com.aiang.data.di.Injection
 import com.aiang.data.preferences.UserModel
 import com.aiang.ui.common.UiState
 import com.aiang.ui.common.ViewModelFactory
+import com.aiang.ui.navigation.Screen
 import com.aiang.ui.theme.AIANGTheme
 
 @Composable
 fun ProfileScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navController: NavHostController
 ) {
     val viewModel: ProfileViewModel = viewModel(
         factory = ViewModelFactory(Injection.provideRepository(LocalContext.current))
@@ -121,8 +125,9 @@ fun ProfileScreen(
         }
         Spacer(modifier = Modifier.height(8.dp))
         Button(onClick = {
-            viewModel.logout()
+            viewModel.getTokenThenLogout()
             viewModel.clearPreference()
+            navController.navigate(Screen.App.route)
         }) {
             Text(
                 text = "Logout",
@@ -159,6 +164,6 @@ fun ResetDataAlertDialog(
 @Composable
 fun ProfileScreenPreview() {
     AIANGTheme {
-        ProfileScreen()
+        ProfileScreen(navController = rememberNavController())
     }
 }

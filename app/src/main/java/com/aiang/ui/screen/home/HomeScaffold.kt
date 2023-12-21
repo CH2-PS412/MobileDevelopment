@@ -37,6 +37,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.aiang.AiangApp
 import com.aiang.R
 import com.aiang.data.di.Injection
 import com.aiang.ui.common.UiState
@@ -97,7 +98,7 @@ private fun HomeContent(
 
     Scaffold (
         bottomBar = {
-            if (currentRoute != Screen.RoutineForm.route && currentRoute != Screen.AddTask.route && currentRoute != Screen.Recommendation.route) {
+            if (currentRoute != Screen.RoutineForm.route && currentRoute != Screen.AddTask.route && currentRoute != Screen.Recommendation.route && currentRoute != Screen.App.route) {
                 Log.i("bottomBar", "false")
                 BottomBar(navController = navController)
             }
@@ -110,7 +111,7 @@ private fun HomeContent(
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(Screen.Profile.route) {
-                ProfileScreen()
+                ProfileScreen(navController = navController,)
             }
             composable(Screen.Calendar.route) {
                 if (isFormFilled == false) {
@@ -136,6 +137,9 @@ private fun HomeContent(
             }
             composable(Screen.Timer.route) {
                 TimerScreen()
+            }
+            composable(Screen.App.route) {
+                AiangApp()
             }
         }
     }

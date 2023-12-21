@@ -39,7 +39,9 @@ interface ApiService {
     ): Call<LoginResponse>
 
     @DELETE("logout")
-    fun logout(): Call<LoginResponse>
+    fun logout(
+        @Header("Authorization") token: String,
+    ): Call<Unit>
 
     @GET("token/{id}")
     fun getToken(@Path("id") id: String): Call<GetTokenResponse>

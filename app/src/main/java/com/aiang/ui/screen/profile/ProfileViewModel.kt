@@ -44,12 +44,40 @@ class ProfileViewModel(private val repository: Repository): ViewModel() {
         }
     }
 
+    fun getTokenThenLogout() {
+        viewModelScope.launch {
+            _uiState.value = UiState.Loading
+
+            val client = ApiConfig.getApiService().getToken(user.userId)
+            client.enqueue(object : Callback<GetTokenResponse> {
+                override fun onResponse(
+                    call: Call<GetTokenResponse>,
+                    response: Response<GetTokenResponse>
+                ) {
+                    val responseBody = response.body()
+                    if (response.isSuccessful && responseBody != null) {
+                        user.token = "Bearer " + responseBody.token!!
+                        logout()
+                    } else {
+                        _uiState.value = UiState.Error(response.message())
+                        Log.e("ProfileViewModel", "onSuccess: ${response.message()}")
+                    }
+                }
+
+                override fun onFailure(call: Call<GetTokenResponse>, t: Throwable) {
+                    _uiState.value = UiState.Error(t.message.toString())
+                    Log.e("ProfileViewModel", "onFailure: ${t.message}")
+                }
+            })
+        }
+    }
+
     fun logout() {
-        val client = ApiConfig.getApiService().logout()
-        client.enqueue(object : Callback<LoginResponse> {
+        val client = ApiConfig.getApiService().logout(user.token)
+        client.enqueue(object : Callback<Unit> {
             override fun onResponse(
-                call: Call<LoginResponse>,
-                response: Response<LoginResponse>
+                call: Call<Unit>,
+                response: Response<Unit>
             ) {
                 if (response.isSuccessful) {
                     Log.i("response.isSuccessful", "success")
@@ -57,7 +85,7 @@ class ProfileViewModel(private val repository: Repository): ViewModel() {
                 else Log.e("LoginViewModel", "onFailure: ${response.errorBody()}")
             }
 
-            override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
+            override fun onFailure(call: Call<Unit>, t: Throwable) {
                 Log.e("LoginViewModel", "onFailure: ${t.message}")
             }
         })
